@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# MacOS lul
+.DS_Store
+
+# Rust
+target/
+
+# Random huge file
+memo.txt
