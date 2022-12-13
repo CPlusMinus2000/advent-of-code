@@ -42,9 +42,11 @@ if __name__ == "__main__":
     sol = Solution(filename)
     x = sol.solve_part1()
     print(f"Part 1: {x}")
-    pyperclip.copy(x)
+    if x is not None:
+        pyperclip.copy(x)
 
-    # sol = Solution(filename)
-    # x = sol.solve_part2()
-    # print(f"Part 2: {x}")
-    # pyperclip.copy(x)
+    sol = Solution(filename)
+    x = sol.solve_part2()
+    print(f"Part 2: {x}")
+    if x is not None:
+        pyperclip.copy(x)
