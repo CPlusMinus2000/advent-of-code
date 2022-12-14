@@ -134,5 +134,7 @@ dmypy.json
 # Rust
 target/
 
-# Random huge file
+# Random huge files
 memo.txt
+sillyXD/
+*grid.txt
