@@ -24,9 +24,6 @@ def print_grid(grid: List[List[str]], printout: bool=True) -> None:
 
 
 FIDELITY = 8
-WIDTH = 492 * FIDELITY
-HEIGHT = 170 * FIDELITY
-BLACKFRAME = np.zeros((HEIGHT, WIDTH, 3), np.uint8)
 FPS = 960
 
 class Encoder:
@@ -38,9 +35,13 @@ class Encoder:
         grid: List[List[str]] = None
     ):
         fourcc = cv2.VideoWriter_fourcc(*codec)
-        self.out = cv2.VideoWriter(filename, fourcc, fps, (WIDTH, HEIGHT))
         self.grid = grid
-        self.frame = np.copy(BLACKFRAME)
+        self.width = len(grid[0]) * FIDELITY
+        self.height = len(grid) * FIDELITY
+        self.out = cv2.VideoWriter(
+            filename, fourcc, fps, (self.width, self.height))
+
+        self.frame = np.zeros((self.height, self.width, 3), np.uint8)
 
         # Draw the grid
         for j in range(len(self.grid)):
@@ -65,7 +66,7 @@ class Encoder:
 
 
 class Solution:
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, part: int, video: str="sol14.mp4"):
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
@@ -78,7 +79,11 @@ class Solution:
             self.points.extend(points)
             self.rocks.append(points)
 
-        self.left = min(x for x, y in self.points) // 3 * 2
+        if part == 1:
+            self.left = min(x for x, y in self.points)
+        elif part == 2:
+            self.left = min(x for x, y in self.points) // 3 * 2
+
         self.right = max(x for x, y in self.points)
         self.bottom = max(y for x, y in self.points)
 
@@ -87,21 +92,22 @@ class Solution:
                 line[i] = (line[i][0] - self.left, line[i][1])
 
         self.right -= self.left
-        self.grid = [['.'] * (2 * self.right) for _ in range(self.bottom + 3)]
+        self.grid = [['.'] * (part * self.right + 1) for _ in range(self.bottom + 3)]
         for line in self.rocks:
             sx, sy = line[0]
             for x, y in line[1:]:
                 for i in range(min(sx, x), max(sx, x) + 1):
                     for j in range(min(sy, y), max(sy, y) + 1):
+                        print(i, j, self.left, self.right)
                         self.grid[j][i] = '#'
 
                 sx, sy = x, y
-        
-        self.grid[self.bottom + 2] = ['#'] * (2 * self.right)
-        self.sand = 500 - self.left
 
-        print(np.array(self.grid).shape)
-        self.encoder = Encoder("../sillyXD/sol14v4.mp4", grid=self.grid)
+        if part == 2:
+            self.grid[self.bottom + 2] = ['#'] * (2 * self.right + 1)
+
+        self.sand = 500 - self.left
+        self.encoder = Encoder(f"../sillyXD/{video}", grid=self.grid)
 
 
     def place_sand(self) -> bool:
@@ -111,7 +117,7 @@ class Solution:
                 if self.grid[sy + 1][sx - 1] != '.':
                     if self.grid[sy + 1][sx + 1] != '.':
                         self.grid[sy][sx] = 'o'
-                        return False
+                        return sx, sy
                     else:
                         sx += 1
                 else:
@@ -119,7 +125,7 @@ class Solution:
 
             sy += 1
 
-        return True
+        return 500 - self.left, 0
 
 
     def place_sand2(self) -> bool:
@@ -142,9 +148,13 @@ class Solution:
 
     def solve_part1(self) -> int:
         count = 0
-        while not self.place_sand():
+        sx, sy = self.place_sand()
+        for _ in tqdm(range(888)):
+            self.encoder.draw((sx, sy))
             count += 1
+            sx, sy = self.place_sand()
 
+        self.encoder.save()
         return count
 
 
@@ -181,13 +191,13 @@ if __name__ == "__main__":
     if args.example:
         filename = f"../data/day{day}ex.txt"
 
-    sol = Solution(filename)
+    sol = Solution(filename, part=1, video="sol14a.mp4")
     x = sol.solve_part1()
     print(f"Part 1: {x}")
     if x is not None:
         pyperclip.copy(x)
 
-    sol = Solution(filename)
+    sol = Solution(filename, part=2, video="sol14v4.mp4")
     x = sol.solve_part2()
     print(f"Part 2: {x}")
     if x is not None:
