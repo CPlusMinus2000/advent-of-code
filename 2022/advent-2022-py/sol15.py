@@ -75,45 +75,23 @@ class Solution:
             edges[sx, sy] = set()
             # Add all positions exactly dist + 1 away from the sensor
             x, y = sx - dist - 1, sy
-            while x != sx:
-                if 0 <= x <= BOX and 0 <= y <= BOX:
-                    edges[sx, sy].add((x, y))
-                    grid[x, y] += 1
-                    if grid[x, y] >= THRESHOLD:
-                        candidates.add((x, y))
+            loops = [
+                (lambda x, y, sx, sy: x != sx, 1, 1),
+                (lambda x, y, sx, sy: y != sy, 1, -1),
+                (lambda x, y, sx, sy: x != sx, -1, -1),
+                (lambda x, y, sx, sy: y != sy, -1, 1)
+            ]
 
-                x += 1
-                y += 1
+            for loop in loops:
+                while loop[0](x, y, sx, sy):
+                    if 0 <= x <= BOX and 0 <= y <= BOX:
+                        edges[sx, sy].add((x, y))
+                        grid[x, y] += 1
+                        if grid[x, y] >= THRESHOLD:
+                            candidates.add((x, y))
 
-            while y != sy:
-                if 0 <= x <= BOX and 0 <= y <= BOX:
-                    edges[sx, sy].add((x, y))
-                    grid[x, y] += 1
-                    if grid[x, y] >= THRESHOLD:
-                        candidates.add((x, y))
-
-                x += 1
-                y -= 1
-
-            while x != sx:
-                if 0 <= x <= BOX and 0 <= y <= BOX:
-                    edges[sx, sy].add((x, y))
-                    grid[x, y] += 1
-                    if grid[x, y] >= THRESHOLD:
-                        candidates.add((x, y))
-
-                x -= 1
-                y -= 1
-
-            while y != sy:
-                if 0 <= x <= BOX and 0 <= y <= BOX:
-                    edges[sx, sy].add((x, y))
-                    grid[x, y] += 1
-                    if grid[x, y] >= THRESHOLD:
-                        candidates.add((x, y))
-
-                x -= 1
-                y += 1
+                    x += loop[1]
+                    y += loop[2]
 
         for cx, cy in tqdm(candidates):
             for l, (sx, sy) in enumerate(self.sensors):
