@@ -5,6 +5,7 @@ import sys
 import pyperclip
 from datetime import datetime
 from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
+from tqdm import tqdm, trange
 
 class Solution:
     def __init__(self, filename: str):
