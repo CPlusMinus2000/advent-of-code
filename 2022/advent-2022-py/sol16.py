@@ -1,17 +1,17 @@
-
 import argparse as ap
 import re
 import sys
 import pyperclip
 import functools
 from datetime import datetime
-from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
+from typing import List, Dict
 from copy import deepcopy
 from tqdm import tqdm
 from collections import deque
 
 
-MINUTES = 30
+MINUTES = 26
+WAIT = ""
 
 
 class Valve:
@@ -23,7 +23,7 @@ class Valve:
 
     def __repr__(self) -> str:
         return f"{self.name} ({self.flow}, {self.opened}) {self.connections}"
-    
+
     def __hash__(self) -> int:
         return hash((self.name, self.opened))
 
@@ -32,7 +32,7 @@ class Valve:
 
     def open(self, time: int) -> None:
         self.opened = time
-    
+
     def close(self) -> None:
         self.opened = 0
 
@@ -45,7 +45,7 @@ class State:
         self.t = t
         self.curr = curr
         self.valves = valves
-    
+
     def __repr__(self) -> str:
         s = f"curr: {self.curr}\n"
         for v in self.valves.values():
@@ -61,7 +61,7 @@ class State:
 
     def total_flow(self) -> int:
         return sum([v.total_flow() for v in self.valves.values()])
-    
+
     def successors(self) -> List["State"]:
         succs = []
         curr_valve = self.valves[self.curr]
@@ -86,13 +86,16 @@ class Stepper_State:
         self,
         valves: Dict[str, Valve],
         graph: Dict[str, Dict[str, int]],
-        curr: str="AA",
-        t: int=0
+        entities: int = 1,
+        curr: str = "AA",
+        t: int = 0,
     ):
         self.valves = valves
         self.graph = graph
-        self.curr = curr
+        self.entities = entities
+        self.curr = [curr] * entities
         self.t = t
+        self.ctimes = [t] * entities
         self.hist = []
 
     def __repr__(self) -> str:
@@ -102,39 +105,62 @@ class Stepper_State:
                 s += f"{v}\n"
 
         return s
-    
+
     def __hash__(self) -> int:
-        return hash((self.t, self.curr, tuple(self.valves.values())))
-    
+        return hash((self.t, tuple(self.curr), tuple(self.valves.values())))
+
     def is_done(self) -> bool:
-        remaining = MINUTES - self.t
-        return all(
-            self.graph[self.curr][vname] >= remaining
-            for vname in self.next_steps()
-        )
-    
+        return self.t >= MINUTES or not self.next_steps()
+
     def total_flow(self) -> int:
         return sum([v.total_flow() for v in self.valves.values()])
-    
-    def step(self, vname: str) -> None:
-        tcost = self.graph[self.curr][vname]
-        self.hist.append((self.curr, tcost))
-        self.t += tcost + 1
-        self.curr = vname
-        self.valves[vname].open(self.t)
-    
+
+    def step(self, actions: List[str]) -> None:
+        self.hist.append((self.curr.copy(), self.ctimes.copy()))
+        for i, vname in enumerate(actions):
+            if vname != WAIT:
+                tcost = self.graph[self.curr[i]][vname]
+                self.ctimes[i] += tcost + 1
+                self.valves[vname].open(self.t + tcost + 1)
+                self.curr[i] = vname
+
+        self.t += 1
+
     def unstep(self) -> None:
-        vname, tcost = self.hist.pop()
-        self.t -= tcost + 1
-        self.valves[self.curr].close()
-        self.curr = vname
-    
+        temp, self.ctimes = self.hist.pop()
+        self.t -= 1
+        for i, vname in enumerate(temp):
+            if vname != self.curr[i]:
+                self.valves[self.curr[i]].close()
+
+        self.curr = temp
+
     def next_steps(self) -> List[str]:
-        return [
-            vname for vname in self.graph[self.curr]
-            if self.graph[self.curr][vname] <= MINUTES - self.t
-            and not self.valves[vname].is_open()
-        ]
+        steps = []
+        for i in range(self.entities):
+            if self.t != self.ctimes[i]:
+                steps.append([WAIT])
+            else:
+                steps.append(
+                    [
+                        vname
+                        for vname in self.graph[self.curr[i]]
+                        if self.graph[self.curr[i]][vname] < MINUTES - self.t
+                        and not self.valves[vname].is_open()
+                    ]
+                )
+
+        if self.entities == 1:
+            return [(s,) for s in steps[0]]
+
+        elif self.entities == 2:
+            ret = []
+            for s1 in steps[0]:
+                for s2 in steps[1]:
+                    if s1 == WAIT or s2 == WAIT or s1 != s2:
+                        ret.append((s1, s2))
+
+            return ret
 
 
 class Solution:
@@ -142,14 +168,14 @@ class Solution:
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
-        
+
         self.valves = {}
         for line in self.input_lines:
             name = line.split()[1]
-            flow = int(line.split()[4].split('=')[1][:-1])
+            flow = int(line.split()[4].split("=")[1][:-1])
             connections = [n[:2] for n in line.split()[9:]]
             self.valves[name] = Valve(name, flow, connections)
-        
+
         # For each valve, do a BFS to find the cost of the shortest path
         # to each other node in the graph with positive flow
         self.graph = {}
@@ -173,7 +199,7 @@ class Solution:
                     queue.append((conn, cost + 1))
 
     def solve_part1_old(self) -> int:
-        start = State(1, 'AA', self.valves)
+        start = State(1, "AA", self.valves)
         stack = [start]
         visited = set()
         best = 0
@@ -189,7 +215,7 @@ class Solution:
                 stack.extend(curr.successors())
 
         return best
-    
+
     def solve_part1(self) -> int:
         """
         Run backtracking search to find an optimal end state.
@@ -211,12 +237,33 @@ class Solution:
         start = Stepper_State(self.valves, self.graph)
         return backtrack(start)
 
-
     def solve_part2(self) -> int:
         """
         Run backtracking search, but this time, you have an elephant
         working with you in parallel and as such, there is more weirdness.
         """
+
+        @functools.lru_cache(maxsize=None)
+        def backtrack(curr: Stepper_State) -> int:
+            if curr.is_done():
+                return curr.total_flow()
+
+            best = 0
+            for vname in curr.next_steps():
+                curr.step(vname)
+                best = max(best, backtrack(curr))
+                curr.unstep()
+
+            return best
+
+        start = Stepper_State(self.valves, self.graph, entities=2)
+        return backtrack(start)
+
+
+def test_setup():
+    sol = Solution("../data/day16ex.txt")
+    ss = Stepper_State(sol.valves, sol.graph, entities=2)
+    return sol, ss
 
 
 if __name__ == "__main__":
@@ -241,15 +288,22 @@ if __name__ == "__main__":
 
     sol = Solution(filename)
     x = sol.solve_part1()
-    print(f"Part 1: {x}")
-    if x is not None:
-        if isinstance(x, tuple):
-            x = x[0]
+    if isinstance(x, tuple):
+        print(x[1])
+        x = x[0]
 
+    if x is not None:
         pyperclip.copy(x)
+
+    print(f"Part 1: {x}")
 
     sol = Solution(filename)
     x = sol.solve_part2()
-    print(f"Part 2: {x}")
+    if isinstance(x, tuple):
+        print(x[1])
+        x = x[0]
+
     if x is not None:
         pyperclip.copy(x)
+
+    print(f"Part 2: {x}")
