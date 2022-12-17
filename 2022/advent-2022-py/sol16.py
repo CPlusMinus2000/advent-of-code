@@ -110,7 +110,7 @@ class Stepper_State:
         return hash((self.t, tuple(self.curr), tuple(self.valves.values())))
 
     def is_done(self) -> bool:
-        return self.t >= MINUTES or not self.next_steps()
+        return self.t >= MINUTES
 
     def total_flow(self) -> int:
         return sum([v.total_flow() for v in self.valves.values()])
@@ -245,11 +245,12 @@ class Solution:
 
         @functools.lru_cache(maxsize=None)
         def backtrack(curr: Stepper_State) -> int:
-            if curr.is_done():
+            next = curr.next_steps()
+            if curr.is_done() or not next:
                 return curr.total_flow()
 
             best = 0
-            for vname in curr.next_steps():
+            for vname in next:
                 curr.step(vname)
                 best = max(best, backtrack(curr))
                 curr.unstep()
