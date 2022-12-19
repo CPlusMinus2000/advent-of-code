@@ -8,7 +8,8 @@ from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
 
 
 WIDTH = 7
-NUM_ROCKS = 2022
+NUM_ROCKS = 15 * 5 * 10091
+BIG_NUM = 10 ** 12
 HEIGHT = 4 * NUM_ROCKS
 TYPES = 5
 
@@ -192,7 +193,8 @@ class Rock:
         # lock the shape into the chamber
         for dy in range(len(self.shape)):
             for dx in range(len(self.shape[dy])):
-                self.chamber[self.y + dy][self.x + dx] = self.shape[dy][dx]
+                if self.shape[dy][dx] == "#":
+                    self.chamber[self.y + dy][self.x + dx] = self.shape[dy][dx]
 
         return self.y + HEIGHTS[self.typ]
 
@@ -238,14 +240,35 @@ class Solution:
                 dir_index += 1
             
             self.max_height = max(self.max_height, rock.lock())
-        
-        with open("../data/day17out.txt", "w") as f:
-            f.write(self.__str__())
 
         return self.max_height
 
     def solve_part2(self) -> int:
-        pass
+        pattern = [
+            0,
+            79167,
+            158296,
+            237434,
+            316575,
+            395716,
+            474852,
+            554004,
+            633133,
+            712257,
+            791416,
+            870562,
+            949698,
+            1028839,
+            1107974,
+            1187104
+        ]
+
+        diffs = [
+            pattern[i] - pattern[i - 1]
+            for i in range(1, len(pattern))
+        ]
+
+        print(diffs)
 
 
 def test() -> Solution:

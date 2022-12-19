@@ -6,6 +6,8 @@ import pyperclip
 from datetime import datetime
 from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
 from tqdm import tqdm, trange
+from collections import defaultdict
+
 
 class Solution:
     def __init__(self, filename: str):
