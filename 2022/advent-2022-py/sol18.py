@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -24,21 +23,19 @@ class Solution:
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
-        
+
         self.cubes = []
         for line in self.input_lines:
             cube = tuple(int(x) for x in line.split(","))
             self.cubes.append(cube)
-        
+
         self.insides = defaultdict(int)
         self.max_x = max(x for x, _, _ in self.cubes)
         self.max_y = max(y for _, y, _ in self.cubes)
         self.max_z = max(z for _, _, z in self.cubes)
         self.grid = [
-            [
-                ['.'] * (self.max_z + 1)
-                for _ in range(self.max_y + 1)
-            ] for _ in range(self.max_x + 1)
+            [["."] * (self.max_z + 1) for _ in range(self.max_y + 1)]
+            for _ in range(self.max_x + 1)
         ]
 
     def solve_part1(self) -> int:
@@ -54,26 +51,27 @@ class Solution:
                         sides += 1
                     else:
                         sides -= 1
-            
+
             cube_set.add(cube)
 
         return sides
 
-
     def solve_part2(self) -> int:
         # Okay, we have to construct a 3D grid for this
         for x, y, z in self.cubes:
-            self.grid[x][y][z] = '#'
-        
+            self.grid[x][y][z] = "#"
+
         # Now construct a stack representing the "outside"
         outside = []
         for x in range(self.max_x + 1):
             for y in range(self.max_y + 1):
                 for z in range(self.max_z + 1):
-                    if (x == 0 or x == self.max_x) or \
-                        (y == 0 or y == self.max_y) or \
-                        (z == 0 or z == self.max_z):
-                        if self.grid[x][y][z] == '.':
+                    if (
+                        (x == 0 or x == self.max_x)
+                        or (y == 0 or y == self.max_y)
+                        or (z == 0 or z == self.max_z)
+                    ):
+                        if self.grid[x][y][z] == ".":
                             outside.append((x, y, z))
 
         visited = set()
@@ -83,16 +81,18 @@ class Solution:
                 continue
 
             visited.add((x, y, z))
-            self.grid[x][y][z] = 'o'
+            self.grid[x][y][z] = "o"
             for offset in [-1, 1]:
                 for i in range(3):
                     c_offset = [0, 0, 0]
                     c_offset[i] = offset
                     dx, dy, dz = c_offset
-                    if 0 <= x + dx <= self.max_x and \
-                        0 <= y + dy <= self.max_y and \
-                        0 <= z + dz <= self.max_z:
-                        if self.grid[x + dx][y + dy][z + dz] == '.':
+                    if (
+                        0 <= x + dx <= self.max_x
+                        and 0 <= y + dy <= self.max_y
+                        and 0 <= z + dz <= self.max_z
+                    ):
+                        if self.grid[x + dx][y + dy][z + dz] == ".":
                             outside.append((x + dx, y + dy, z + dz))
 
         # Now grab all the coords of the '.'s and use them
@@ -101,22 +101,21 @@ class Solution:
         for x in range(self.max_x + 1):
             for y in range(self.max_y + 1):
                 for z in range(self.max_z + 1):
-                    if self.grid[x][y][z] == '.':
+                    if self.grid[x][y][z] == ".":
                         for offset in [-1, 1]:
                             for i in range(3):
                                 c_offset = [0, 0, 0]
                                 c_offset[i] = offset
                                 dx, dy, dz = c_offset
-                                if 0 <= x + dx <= self.max_x and \
-                                    0 <= y + dy <= self.max_y and \
-                                    0 <= z + dz <= self.max_z:
-                                    if self.grid[x + dx][y + dy][z + dz] == '#':
+                                if (
+                                    0 <= x + dx <= self.max_x
+                                    and 0 <= y + dy <= self.max_y
+                                    and 0 <= z + dz <= self.max_z
+                                ):
+                                    if self.grid[x + dx][y + dy][z + dz] == "#":
                                         count += 1
 
         return self.solve_part1() - count
-        
-
-
 
 
 if __name__ == "__main__":
