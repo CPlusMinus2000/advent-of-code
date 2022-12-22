@@ -46,7 +46,29 @@ class Solution:
             
 
     def solve_part2(self) -> int:
-        pass
+        for i in range(len(self.encrypted)):
+            self.encrypted[i] *= DKEY
+
+        l = len(self.encrypted)
+        indices = [-1] * l
+        iindex = 0
+        for i in range(l):
+            # Swap out pieces of self.encrypted and indices
+            # and use indices to determine where everything is
+            # in self.encrypted
+            while indices[iindex] != -1:
+                iindex += 1
+
+            val = self.encrypted.pop(iindex)
+            self.encrypted.insert((iindex + val) % (l - 1), val)
+            indices.pop(iindex)
+            indices.insert((iindex + val) % (l - 1), i)
+
+        zindex = self.encrypted.index(0)
+        return sum(
+            self.encrypted[(i + zindex) % l]
+            for i in [1000, 2000, 3000]
+        )
 
 
 if __name__ == "__main__":
