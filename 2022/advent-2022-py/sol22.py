@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -16,19 +15,9 @@ L = (-1, 0)
 D = (0, 1)
 U = (0, -1)
 DIRECTIONS = [R, D, L, U]
-DIR_VAL = {
-    R: 0,
-    D: 1,
-    L: 2,
-    U: 3
-}
+DIR_VAL = {R: 0, D: 1, L: 2, U: 3}
 
-DIR_CHARS = {
-    R: '>',
-    D: 'v',
-    L: '<',
-    U: '^'
-}
+DIR_CHARS = {R: ">", D: "v", L: "<", U: "^"}
 
 SIDE = 50
 
@@ -90,7 +79,7 @@ class Solution:
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
-        
+
         instructions = self.input_lines[-1]
         # instructions look like 10R5L5R..., so use regex to find all
         # the numbers plus letters
@@ -98,36 +87,31 @@ class Solution:
         self.instructions = []
         for instr in instructions:
             self.instructions.append((int(instr[:-1]), instr[-1]))
-        
+
         self.last = int(re.findall(r"\d+", self.input_lines[-1])[-1])
-        
+
         self.grid = []
         for line in self.input_lines[:-2]:
             self.grid.append(list(line))
-        
+
         self.path = deepcopy(self.grid)
-        
-        self.widths = [sum(1 for r in row if r != ' ') for row in self.grid]
+
+        self.widths = [sum(1 for r in row if r != " ") for row in self.grid]
         self.heights = []
         max_x = max(len(row) for row in self.grid)
         for i in range(max_x):
             self.heights.append(
-                sum(
-                    1 for row in self.grid
-                    if i < len(row) and row[i] != ' '
-                )
+                sum(1 for row in self.grid if i < len(row) and row[i] != " ")
             )
-        
+
         x = 0
-        while self.grid[0][x] == ' ':
+        while self.grid[0][x] == " ":
             x += 1
-        
+
         self.start = (x, 0)
-    
+
     def next_pos(
-        self,
-        curr: Tuple[int, int],
-        direction: Tuple[int, int]
+        self, curr: Tuple[int, int], direction: Tuple[int, int]
     ) -> Tuple[int, int]:
         x, y = curr
         dx, dy = direction
@@ -138,7 +122,7 @@ class Solution:
                 return (x + self.widths[y], y)
             elif x >= len(self.grid[y]):
                 return (x - self.widths[y], y)
-            elif self.grid[y][x] == ' ':
+            elif self.grid[y][x] == " ":
                 return (x + self.widths[y], y)
             else:
                 return (x, y)
@@ -148,19 +132,17 @@ class Solution:
                 return (x, y + self.heights[x])
             elif y >= len(self.grid):
                 return (x, y - self.heights[x])
-            elif dy < 0 and (x >= len(self.grid[y]) or self.grid[y][x] == ' '):
+            elif dy < 0 and (x >= len(self.grid[y]) or self.grid[y][x] == " "):
                 return (x, y + self.heights[x])
-            elif dy > 0 and (x >= len(self.grid[y]) or self.grid[y][x] == ' '):
+            elif dy > 0 and (x >= len(self.grid[y]) or self.grid[y][x] == " "):
                 return (x, y - self.heights[x])
             else:
                 return (x, y)
-        
+
         raise ValueError(f"Invalid direction: {direction}")
-    
+
     def next_pos2(
-        self,
-        curr: Tuple[int, int],
-        direction: Tuple[int, int]
+        self, curr: Tuple[int, int], direction: Tuple[int, int]
     ) -> Tuple[int, int, Tuple[int, int]]:
         x, y = curr
         dx, dy = direction
@@ -173,7 +155,7 @@ class Solution:
                 return NEXT_FACE[face, direction](x, y)
             elif x >= len(self.grid[y]):
                 return NEXT_FACE[face, direction](x, y)
-            elif self.grid[y][x] == ' ':
+            elif self.grid[y][x] == " ":
                 return NEXT_FACE[face, direction](x, y)
             else:
                 return x, y, direction
@@ -183,13 +165,13 @@ class Solution:
                 return NEXT_FACE[face, direction](x, y)
             elif y >= len(self.grid):
                 return NEXT_FACE[face, direction](x, y)
-            elif dy < 0 and (x >= len(self.grid[y]) or self.grid[y][x] == ' '):
+            elif dy < 0 and (x >= len(self.grid[y]) or self.grid[y][x] == " "):
                 return NEXT_FACE[face, direction](x, y)
-            elif dy > 0 and (x >= len(self.grid[y]) or self.grid[y][x] == ' '):
+            elif dy > 0 and (x >= len(self.grid[y]) or self.grid[y][x] == " "):
                 return NEXT_FACE[face, direction](x, y)
             else:
                 return x, y, direction
-        
+
         raise ValueError(f"Invalid direction: {direction}")
 
     def solve_part1(self) -> int:
@@ -198,20 +180,20 @@ class Solution:
         for dist, turn in self.instructions:
             for _ in range(dist):
                 x, y = self.next_pos(curr, direction)
-                if self.grid[y][x] == '#':
+                if self.grid[y][x] == "#":
                     break
 
                 curr = (x, y)
-            
+
             direction = next_direction(direction, turn)
-        
+
         for _ in range(self.last):
             x, y = self.next_pos(curr, direction)
-            if self.grid[y][x] == '#':
+            if self.grid[y][x] == "#":
                 break
 
             curr = (x, y)
-        
+
         return 1000 * (curr[1] + 1) + 4 * (curr[0] + 1) + DIR_VAL[direction]
 
     def solve_part2(self) -> int:
@@ -219,28 +201,26 @@ class Solution:
         direction = (1, 0)
         for i, (dist, turn) in enumerate(self.instructions):
             for _ in range(dist):
-                temp = direction
-                x, y, direction = self.next_pos2(curr, direction)
-                if self.grid[y][x] == '#':
-                    direction = temp
+                x, y, d = self.next_pos2(curr, direction)
+                if self.grid[y][x] == "#":
                     break
 
                 self.path[curr[1]][curr[0]] = DIR_CHARS[direction]
-                curr = (x, y)
-            
+                curr, direction = (x, y), d
+
             direction = next_direction(direction, turn)
-        
+
         for _ in range(self.last):
             x, y, direction = self.next_pos2(curr, direction)
-            if self.grid[y][x] == '#':
+            if self.grid[y][x] == "#":
                 break
 
             self.path[curr[1]][curr[0]] = DIR_CHARS[direction]
             curr = (x, y)
-        
+
         with open("path.txt", "w") as f:
             for row in self.path:
-                f.write("".join(row) + '\n')
+                f.write("".join(row) + "\n")
 
         return 1000 * (curr[1] + 1) + 4 * (curr[0] + 1) + DIR_VAL[direction]
 
