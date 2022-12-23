@@ -33,30 +33,30 @@ DIR_CHARS = {
 SIDE = 50
 
 NEXT_FACE = {
-    (1, R): lambda x, y: (x, y, R),
-    (1, D): lambda x, y: (x, y, D),
-    (1, L): lambda x, y: (0, 149 - y, R),
+    # (1, R): lambda x, y: (x, y, R),
+    # (1, D): lambda x, y: (x, y, D),
+    (1, L): lambda x, y: (0, (3 * SIDE - 1) - y, R),
     (1, U): lambda x, y: (0, x + 100, R),
-    (2, R): lambda x, y: (99, 149 - y, L),
-    (2, D): lambda x, y: (99, x - 50, L),
-    (2, L): lambda x, y: (x, y, L),
-    (2, U): lambda x, y: (x - 100, 199, U),
+    (2, R): lambda x, y: (2 * SIDE - 1, (3 * SIDE - 1) - y, L),
+    (2, D): lambda x, y: (2 * SIDE - 1, x - 50, L),
+    # (2, L): lambda x, y: (x, y, L),
+    (2, U): lambda x, y: (x - 100, 4 * SIDE - 1, U),
     (3, R): lambda x, y: (y + 50, 49, U),
-    (3, D): lambda x, y: (x, y, D),
+    # (3, D): lambda x, y: (x, y, D),
     (3, L): lambda x, y: (y - 50, 100, D),
-    (3, U): lambda x, y: (x, y, U),
-    (4, R): lambda x, y: (x, y, R),
-    (4, D): lambda x, y: (x, y, D),
-    (4, L): lambda x, y: (50, 149 - y, R),
+    # (3, U): lambda x, y: (x, y, U),
+    # (4, R): lambda x, y: (x, y, R),
+    # (4, D): lambda x, y: (x, y, D),
+    (4, L): lambda x, y: (50, (3 * SIDE - 1) - y, R),
     (4, U): lambda x, y: (50, x + 50, R),
-    (5, R): lambda x, y: (149, 149 - y, L),
+    (5, R): lambda x, y: ((3 * SIDE - 1), (3 * SIDE - 1) - y, L),
     (5, D): lambda x, y: (49, x + 100, L),
-    (5, L): lambda x, y: (x, y, L),
-    (5, U): lambda x, y: (x, y, U),
-    (6, R): lambda x, y: (y - 100, 149, U),
+    # (5, L): lambda x, y: (x, y, L),
+    # (5, U): lambda x, y: (x, y, U),
+    (6, R): lambda x, y: (y - 100, 3 * SIDE - 1, U),
     (6, D): lambda x, y: (x + 100, 0, D),
     (6, L): lambda x, y: (y - 100, 0, D),
-    (6, U): lambda x, y: (x, y, U)
+    # (6, U): lambda x, y: (x, y, U)
 }
 
 
@@ -167,7 +167,7 @@ class Solution:
         x += dx
         y += dy
         face = find_face(*curr)
-        print(f"next_pos2: {x=}, {y=}, {face=}")
+        # print(f"next_pos2: {x=}, {y=}, {face=}")
         if dx:
             if x < 0:
                 return NEXT_FACE[face, direction](x, y)
@@ -217,12 +217,12 @@ class Solution:
     def solve_part2(self) -> int:
         curr = self.start
         direction = (1, 0)
-        for dist, turn in self.instructions:
+        for i, (dist, turn) in enumerate(self.instructions):
             for _ in range(dist):
-                print(f"Before: {curr=}, {direction=}")
+                temp = direction
                 x, y, direction = self.next_pos2(curr, direction)
-                print(f"After: {x=}, {y=}, {direction=}", end='\n\n')
                 if self.grid[y][x] == '#':
+                    direction = temp
                     break
 
                 self.path[curr[1]][curr[0]] = DIR_CHARS[direction]
@@ -232,7 +232,6 @@ class Solution:
         
         for _ in range(self.last):
             x, y, direction = self.next_pos2(curr, direction)
-            print(curr, direction, x, y)
             if self.grid[y][x] == '#':
                 break
 
@@ -244,6 +243,11 @@ class Solution:
                 f.write("".join(row) + '\n')
 
         return 1000 * (curr[1] + 1) + 4 * (curr[0] + 1) + DIR_VAL[direction]
+
+
+def test() -> Solution:
+    sol = Solution("../data/day22.txt")
+    return sol
 
 
 if __name__ == "__main__":
