@@ -4,9 +4,6 @@ import re
 import sys
 import pyperclip
 from datetime import datetime
-from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
-from tqdm import tqdm, trange
-from collections import defaultdict, deque
 
 
 DKEY = 811589153
