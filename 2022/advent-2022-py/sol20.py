@@ -36,8 +36,6 @@ class Solution:
             indices.pop(iindex)
             indices.insert((iindex + val) % (l - 1), True)
 
-        print(self.encrypted)
-
         zindex = self.encrypted.index(0)
         return sum(
             self.encrypted[(i + zindex) % l]
@@ -53,9 +51,6 @@ class Solution:
         indices = [-1] * l
         iindex = 0
         for i in range(l):
-            # Swap out pieces of self.encrypted and indices
-            # and use indices to determine where everything is
-            # in self.encrypted
             while indices[iindex] != -1:
                 iindex += 1
 
@@ -63,6 +58,16 @@ class Solution:
             self.encrypted.insert((iindex + val) % (l - 1), val)
             indices.pop(iindex)
             indices.insert((iindex + val) % (l - 1), i)
+        
+        # Now mix self.encrypted 9 more times, but notably,
+        # mix them up in the order they were originally mixed up
+        for _ in range(9):
+            for i in range(l):
+                iindex = indices.index(i)
+                val = self.encrypted.pop(iindex)
+                self.encrypted.insert((iindex + val) % (l - 1), val)
+                indices.pop(iindex)
+                indices.insert((iindex + val) % (l - 1), i)
 
         zindex = self.encrypted.index(0)
         return sum(
