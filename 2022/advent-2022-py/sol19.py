@@ -91,7 +91,7 @@ class Solution:
                     ))
                 
                 if ore >= obcosto and clay >= obcostc:
-                    options = [(
+                    options.append((
                         t + 1,
                         ore + ore_robots - obcosto,
                         clay + clay_robots - obcostc,
@@ -100,7 +100,7 @@ class Solution:
                         clay_robots,
                         obsidian_robots + 1,
                         geode_robots,
-                    )]
+                    ))
                 
                 if ore >= gcosto and obsidian >= gcostob:
                     options = [(
