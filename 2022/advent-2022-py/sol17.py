@@ -3,6 +3,7 @@ import argparse as ap
 import re
 import sys
 import pyperclip
+from frozendict import frozendict
 from datetime import datetime
 from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
 
@@ -207,6 +208,7 @@ class Solution:
     
         self.chamber = [['.'] * WIDTH for _ in range(HEIGHT)]
         self.max_height = 0
+        self.cache = {}
 
     def __str__(self) -> str:
         base = '+' + '-' * WIDTH + '+'
@@ -243,32 +245,22 @@ class Solution:
 
         return self.max_height
 
+
+    def add_to_cache(self) -> None:
+        stack = [(x, self.max_height) for x in range(WIDTH)]
+        topology = {}
+        visited = set()
+        while stack:
+            x, y = stack.pop()
+            if (x, y) in visited:
+                continue
+
+            visited.add((x, y))
+            if self.chamber[y][x] == '#':
+                continue
+
     def solve_part2(self) -> int:
-        pattern = [
-            0,
-            79167,
-            158296,
-            237434,
-            316575,
-            395716,
-            474852,
-            554004,
-            633133,
-            712257,
-            791416,
-            870562,
-            949698,
-            1028839,
-            1107974,
-            1187104
-        ]
-
-        diffs = [
-            pattern[i] - pattern[i - 1]
-            for i in range(1, len(pattern))
-        ]
-
-        print(diffs)
+        pass
 
 
 def test() -> Solution:
