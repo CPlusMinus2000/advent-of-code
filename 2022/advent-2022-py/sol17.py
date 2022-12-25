@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -10,7 +9,7 @@ from typing import List, Dict, Set, Callable, Tuple, Union, Optional, Any
 
 WIDTH = 7
 NUM_ROCKS = 15 * 5 * 10091
-BIG_NUM = 10 ** 12
+BIG_NUM = 10**12
 HEIGHT = 4 * NUM_ROCKS
 TYPES = 5
 
@@ -24,15 +23,10 @@ ROCKS = [
     ["##", "##"],
 ]
 
-WIDTHS = {
-    i: max(len(r) for r in ROCKS[i])
-    for i in range(1, TYPES + 1)
-}
+WIDTHS = {i: max(len(r) for r in ROCKS[i]) for i in range(1, TYPES + 1)}
 
-HEIGHTS = {
-    i: len(ROCKS[i])
-    for i in range(1, TYPES + 1)
-}
+HEIGHTS = {i: len(ROCKS[i]) for i in range(1, TYPES + 1)}
+
 
 class Rock:
     def __init__(self, x: int, y: int, typ: int, chamber: List[List[str]]):
@@ -42,46 +36,48 @@ class Rock:
         self.typ = typ
         self.shape = ROCKS[typ]
         self.chamber = chamber
-    
+
     def __repr__(self) -> str:
         return f"({self.x}, {self.y}) {self.typ}"
-    
+
     def push_left(self) -> None:
         if self.x == 0:
             return
-        
+
         if self.typ == 1:
             if self.chamber[self.y][self.x - 1] == ".":
                 self.x -= 1
         elif self.typ == 2:
-            if self.chamber[self.y][self.x] == '.' and \
-                self.chamber[self.y + 1][self.x - 1] == '.' and \
-                self.chamber[self.y + 2][self.x] == '.':
+            if (
+                self.chamber[self.y][self.x] == "."
+                and self.chamber[self.y + 1][self.x - 1] == "."
+                and self.chamber[self.y + 2][self.x] == "."
+            ):
 
                 self.x -= 1
         elif self.typ == 3:
-            if self.chamber[self.y][self.x - 1] == "." and \
-                self.chamber[self.y + 1][self.x + 1] == "." and \
-                self.chamber[self.y + 2][self.x + 1] == ".":
-            
+            if (
+                self.chamber[self.y][self.x - 1] == "."
+                and self.chamber[self.y + 1][self.x + 1] == "."
+                and self.chamber[self.y + 2][self.x + 1] == "."
+            ):
+
                 self.x -= 1
         elif self.typ == 4:
             if all(
-                self.chamber[self.y + dy][self.x - 1] == '.'
-                for dy in range(HEIGHTS[4])
+                self.chamber[self.y + dy][self.x - 1] == "." for dy in range(HEIGHTS[4])
             ):
                 self.x -= 1
         elif self.typ == 5:
             if all(
-                self.chamber[self.y + dy][self.x - 1] == '.'
-                for dy in range(HEIGHTS[5])
+                self.chamber[self.y + dy][self.x - 1] == "." for dy in range(HEIGHTS[5])
             ):
                 self.x -= 1
-    
+
     def push_left_smart(self) -> None:
         if self.x == 0:
             return
-        
+
         for dy in range(len(self.shape)):
             for dx in range(len(self.shape[dy])):
                 if self.shape[dy][dx] == "#" and (
@@ -89,46 +85,47 @@ class Rock:
                 ):
                     if self.chamber[self.y + dy][self.x + dx - 1] != ".":
                         return
-        
+
         self.x -= 1
-                    
-    
+
     def push_right(self) -> None:
         if self.x == WIDTH - WIDTHS[self.typ]:
             return
-        
+
         if self.typ == 1:
             if self.chamber[self.y][self.x + WIDTHS[1]] == ".":
                 self.x += 1
         elif self.typ == 2:
-            if self.chamber[self.y][self.x + 2] == '.' and \
-                self.chamber[self.y + 1][self.x + WIDTHS[2]] == '.' and \
-                self.chamber[self.y + 2][self.x + 2] == '.':
+            if (
+                self.chamber[self.y][self.x + 2] == "."
+                and self.chamber[self.y + 1][self.x + WIDTHS[2]] == "."
+                and self.chamber[self.y + 2][self.x + 2] == "."
+            ):
 
                 self.x += 1
         elif self.typ == 3:
             if all(
-                self.chamber[self.y + dy][self.x + WIDTHS[3]] == '.'
+                self.chamber[self.y + dy][self.x + WIDTHS[3]] == "."
                 for dy in range(HEIGHTS[3])
             ):
                 self.x += 1
         elif self.typ == 4:
             if all(
-                self.chamber[self.y + dy][self.x + WIDTHS[4]] == '.'
+                self.chamber[self.y + dy][self.x + WIDTHS[4]] == "."
                 for dy in range(HEIGHTS[4])
             ):
                 self.x += 1
         elif self.typ == 5:
             if all(
-                self.chamber[self.y + dy][self.x + WIDTHS[5]] == '.'
+                self.chamber[self.y + dy][self.x + WIDTHS[5]] == "."
                 for dy in range(HEIGHTS[5])
             ):
                 self.x += 1
-        
+
     def push_right_smart(self) -> None:
         if self.x == WIDTH - WIDTHS[self.typ]:
             return
-        
+
         for dy in range(len(self.shape)):
             for dx in range(len(self.shape[dy])):
                 if self.shape[dy][dx] == "#" and (
@@ -136,50 +133,49 @@ class Rock:
                 ):
                     if self.chamber[self.y + dy][self.x + dx + 1] != ".":
                         return
-        
+
         self.x += 1
-    
+
     def fall(self) -> None:
         self.y -= 1
-    
+
     def at_bottom(self) -> bool:
         if self.y == 0:
             return True
-        
+
         if self.typ == 1:
             if all(
-                self.chamber[self.y - 1][self.x + dx] == '.'
-                for dx in range(WIDTHS[1])
+                self.chamber[self.y - 1][self.x + dx] == "." for dx in range(WIDTHS[1])
             ):
                 return False
         elif self.typ == 2:
-            if self.chamber[self.y][self.x] == '.' and \
-                self.chamber[self.y - 1][self.x + 1] == '.' and \
-                self.chamber[self.y][self.x + 2] == '.':
+            if (
+                self.chamber[self.y][self.x] == "."
+                and self.chamber[self.y - 1][self.x + 1] == "."
+                and self.chamber[self.y][self.x + 2] == "."
+            ):
 
                 return False
         elif self.typ == 3:
             if all(
-                self.chamber[self.y - 1][self.x + dx] == '.'
-                for dx in range(WIDTHS[3])
+                self.chamber[self.y - 1][self.x + dx] == "." for dx in range(WIDTHS[3])
             ):
                 return False
         elif self.typ == 4:
-            if self.chamber[self.y - 1][self.x] == '.':
+            if self.chamber[self.y - 1][self.x] == ".":
                 return False
         elif self.typ == 5:
             if all(
-                self.chamber[self.y - 1][self.x + dx] == '.'
-                for dx in range(WIDTHS[5])
+                self.chamber[self.y - 1][self.x + dx] == "." for dx in range(WIDTHS[5])
             ):
                 return False
 
         return True
-    
+
     def at_bottom_smart(self) -> bool:
         if self.y == 0:
             return True
-        
+
         for dy in range(len(self.shape)):
             for dx in range(len(self.shape[dy])):
                 if self.shape[dy][dx] == "#" and (
@@ -187,9 +183,9 @@ class Rock:
                 ):
                     if self.chamber[self.y + dy - 1][self.x + dx] != ".":
                         return True
-        
+
         return False
-    
+
     def lock(self) -> int:
         # lock the shape into the chamber
         for dy in range(len(self.shape)):
@@ -205,18 +201,18 @@ class Solution:
         with open(filename, "r") as f:
             self.input = f.read()
             self.ilen = len(self.input)
-    
-        self.chamber = [['.'] * WIDTH for _ in range(HEIGHT)]
+
+        self.chamber = [["."] * WIDTH for _ in range(HEIGHT)]
         self.max_height = 0
         self.cache = {}
 
     def __str__(self) -> str:
-        base = '+' + '-' * WIDTH + '+'
+        base = "+" + "-" * WIDTH + "+"
         for i in range(self.max_height):
-            base = '|' + ''.join(self.chamber[i]) + '|\n' + base
-        
+            base = "|" + "".join(self.chamber[i]) + "|\n" + base
+
         return base
-    
+
     def __repr__(self) -> str:
         return self.__str__()
 
@@ -226,25 +222,24 @@ class Solution:
             rock = Rock(2, self.max_height + 3, (i % 5) + 1, self.chamber)
             direction = self.input[dir_index % self.ilen]
             dir_index += 1
-            if direction == '<':
+            if direction == "<":
                 rock.push_left_smart()
-            elif direction == '>':
+            elif direction == ">":
                 rock.push_right_smart()
 
             while not rock.at_bottom_smart():
                 rock.fall()
                 direction = self.input[dir_index % self.ilen]
-                if direction == '<':
+                if direction == "<":
                     rock.push_left_smart()
-                elif direction == '>':
+                elif direction == ">":
                     rock.push_right_smart()
 
                 dir_index += 1
-            
+
             self.max_height = max(self.max_height, rock.lock())
 
         return self.max_height
-
 
     def add_to_cache(self) -> None:
         stack = [(x, self.max_height) for x in range(WIDTH)]
@@ -256,7 +251,7 @@ class Solution:
                 continue
 
             visited.add((x, y))
-            if self.chamber[y][x] == '#':
+            if self.chamber[y][x] == "#":
                 continue
 
     def solve_part2(self) -> int:

@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -9,16 +8,14 @@ from collections import defaultdict
 def sgn(x):
     return -1 if x < 0 else 1
 
+
 class Solution:
     def __init__(self, filename: str):
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
 
-        self.steps = [
-            (l.split()[0], int(l.split()[1]))
-            for l in self.input_lines
-        ]
+        self.steps = [(l.split()[0], int(l.split()[1])) for l in self.input_lines]
 
     def solve_part1(self) -> int:
         positions = {(0, 0): True}
@@ -37,8 +34,9 @@ class Solution:
                     hy += 1
 
                 # Catch the tail up to the head
-                if (abs(hx - tx) >= 2 and abs(hy - ty) >= 1) or \
-                     (abs(hx - tx) >= 1 and abs(hy - ty) >= 2):
+                if (abs(hx - tx) >= 2 and abs(hy - ty) >= 1) or (
+                    abs(hx - tx) >= 1 and abs(hy - ty) >= 2
+                ):
 
                     tx, ty = prev
                 if abs(hx - tx) >= 2:
@@ -68,15 +66,20 @@ class Solution:
 
                 # Catch the tails up
                 for i in range(1, len(knots)):
-                    if (abs(knots[i-1][0] - knots[i][0]) >= 2 and abs(knots[i-1][1] - knots[i][1]) >= 1) or \
-                         (abs(knots[i-1][0] - knots[i][0]) >= 1 and abs(knots[i-1][1] - knots[i][1]) >= 2):
+                    if (
+                        abs(knots[i - 1][0] - knots[i][0]) >= 2
+                        and abs(knots[i - 1][1] - knots[i][1]) >= 1
+                    ) or (
+                        abs(knots[i - 1][0] - knots[i][0]) >= 1
+                        and abs(knots[i - 1][1] - knots[i][1]) >= 2
+                    ):
 
-                        knots[i][0] += sgn(knots[i-1][0] - knots[i][0])
-                        knots[i][1] += sgn(knots[i-1][1] - knots[i][1])
-                    elif abs(knots[i-1][0] - knots[i][0]) >= 2:
-                        knots[i][0] += sgn(knots[i-1][0] - knots[i][0])
-                    elif abs(knots[i-1][1] - knots[i][1]) >= 2:
-                        knots[i][1] += sgn(knots[i-1][1] - knots[i][1])
+                        knots[i][0] += sgn(knots[i - 1][0] - knots[i][0])
+                        knots[i][1] += sgn(knots[i - 1][1] - knots[i][1])
+                    elif abs(knots[i - 1][0] - knots[i][0]) >= 2:
+                        knots[i][0] += sgn(knots[i - 1][0] - knots[i][0])
+                    elif abs(knots[i - 1][1] - knots[i][1]) >= 2:
+                        knots[i][1] += sgn(knots[i - 1][1] - knots[i][1])
 
                 x, y = knots[-1]
                 positions[x, y] = True

@@ -24,9 +24,7 @@ class Solution:
         self.input = self.input.replace("S", "a")
         self.input = self.input.replace("E", "z")
         self.input_lines = self.input.splitlines()
-        self.grid = [
-            [ord(c) - ord("a") for c in line] for line in self.input_lines
-        ]
+        self.grid = [[ord(c) - ord("a") for c in line] for line in self.input_lines]
 
     def solve_part1(self) -> int:
         # Do BFS on the grid, but can only move to adjacent cells
@@ -56,8 +54,7 @@ class Solution:
                 return len(path) - 1
 
             for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-                if 0 <= x + dx < len(self.grid[0]) and \
-                    0 <= y + dy < len(self.grid):
+                if 0 <= x + dx < len(self.grid[0]) and 0 <= y + dy < len(self.grid):
                     if (
                         self.grid[y + dy][x + dx] - self.grid[y][x] <= 1
                         and (x + dx, y + dy) not in visited

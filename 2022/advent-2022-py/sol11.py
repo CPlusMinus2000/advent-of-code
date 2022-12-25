@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -15,7 +14,7 @@ class Monkey:
         operation: Callable[[int], int],
         op_parts: List[str],
         test: Callable[[int], int],
-        test_ints: List[int]
+        test_ints: List[int],
     ):
         self.items = [int(x) for x in items]
         self.operation = operation
@@ -38,7 +37,7 @@ class Monkey:
 
             self.inspections += 1
 
-    def throw(self, monkeys: List["Monkey"], mod: int=0):
+    def throw(self, monkeys: List["Monkey"], mod: int = 0):
         while self.items:
             item = self.items.pop(0)
             if mod:
@@ -58,13 +57,12 @@ class Solution:
         for monkey in self.input_monkeys:
             lines = monkey.splitlines()
             items = lines[1].split(": ")[1].split(", ")
-            op = lines[2].split(": ")[1].replace("new = ", '')
+            op = lines[2].split(": ")[1].replace("new = ", "")
             x, y, z = op.split()
             operation = lambda x, op=op: eval(op.replace("old", str(x)))
             a, b, c = [int(li.split()[-1]) for li in lines[3:]]
             test = lambda x, a=a, b=b, c=c: b if x % a == 0 else c
-            self.monkeys.append(
-                Monkey(items, operation, [x, y, z], test, [a, b, c]))
+            self.monkeys.append(Monkey(items, operation, [x, y, z], test, [a, b, c]))
 
             print(self.monkeys[0].operation(1))
 
@@ -81,7 +79,7 @@ class Solution:
         m = sorted(self.monkeys, key=lambda x: x.inspections, reverse=True)
         return m[0].inspections * m[1].inspections
 
-    def solve_part2(self, iterations: int=10000) -> int:
+    def solve_part2(self, iterations: int = 10000) -> int:
         # Product of all test values
         prod = 1
         for monkey in self.monkeys:

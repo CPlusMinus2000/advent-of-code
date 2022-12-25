@@ -58,8 +58,7 @@ class Solution:
                 self.monkeys[name] = Monkey(name, op=int(expr))
             else:
                 left, op, right = expr.split()
-                self.monkeys[name] = Monkey(
-                    name, left=left, right=right, op=op)
+                self.monkeys[name] = Monkey(name, left=left, right=right, op=op)
 
         for monkey in self.monkeys.values():
             if monkey.op in ["+", "-", "*", "/"]:

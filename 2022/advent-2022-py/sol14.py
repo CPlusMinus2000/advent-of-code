@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -12,13 +11,13 @@ import numpy as np
 import cv2
 
 
-def print_grid(grid: List[List[str]], printout: bool=True) -> None:
+def print_grid(grid: List[List[str]], printout: bool = True) -> None:
     txt = ""
     for row in grid:
         if printout:
             print("".join(row))
 
-        txt += "".join(row) + '\n'
+        txt += "".join(row) + "\n"
 
     return txt
 
@@ -26,31 +25,31 @@ def print_grid(grid: List[List[str]], printout: bool=True) -> None:
 FIDELITY = 8
 FPS = 960
 
+
 class Encoder:
     def __init__(
         self,
         filename: str,
         codec: str = "mp4v",
         fps: int = FPS,
-        grid: List[List[str]] = None
+        grid: List[List[str]] = None,
     ):
         fourcc = cv2.VideoWriter_fourcc(*codec)
         self.grid = grid
         self.width = len(grid[0]) * FIDELITY
         self.height = len(grid) * FIDELITY
-        self.out = cv2.VideoWriter(
-            filename, fourcc, fps, (self.width, self.height))
+        self.out = cv2.VideoWriter(filename, fourcc, fps, (self.width, self.height))
 
         self.frame = np.zeros((self.height, self.width, 3), np.uint8)
 
         # Draw the grid
         for j in range(len(self.grid)):
             for i in range(len(self.grid[0])):
-                if self.grid[j][i] == '#':
+                if self.grid[j][i] == "#":
                     # Draw in grey
                     self.draw((i, j), rgb=(100, 100, 100))
 
-    def draw(self, pixel: Tuple[int], rgb: Tuple[int]=(245, 220, 0)):
+    def draw(self, pixel: Tuple[int], rgb: Tuple[int] = (245, 220, 0)):
         # Convert the pixel to a 1x1 yellow image
         rgb = list(rgb)
         rgb[0] += random.randint(-20, 10)
@@ -58,7 +57,7 @@ class Encoder:
         image = np.array([[rgb[::-1]]], dtype=np.uint8)
         image = cv2.resize(image, (FIDELITY, FIDELITY), interpolation=cv2.INTER_NEAREST)
         x, y = pixel[0] * FIDELITY, pixel[1] * FIDELITY
-        self.frame[y:y+image.shape[0], x:x+image.shape[1], 0:3] = image
+        self.frame[y : y + image.shape[0], x : x + image.shape[1], 0:3] = image
         self.out.write(np.copy(self.frame))
 
     def save(self):
@@ -66,7 +65,7 @@ class Encoder:
 
 
 class Solution:
-    def __init__(self, filename: str, part: int, video: str="sol14.mp4"):
+    def __init__(self, filename: str, part: int, video: str = "sol14.mp4"):
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
@@ -92,31 +91,30 @@ class Solution:
                 line[i] = (line[i][0] - self.left, line[i][1])
 
         self.right -= self.left
-        self.grid = [['.'] * (part * self.right + 1) for _ in range(self.bottom + 3)]
+        self.grid = [["."] * (part * self.right + 1) for _ in range(self.bottom + 3)]
         for line in self.rocks:
             sx, sy = line[0]
             for x, y in line[1:]:
                 for i in range(min(sx, x), max(sx, x) + 1):
                     for j in range(min(sy, y), max(sy, y) + 1):
                         print(i, j, self.left, self.right)
-                        self.grid[j][i] = '#'
+                        self.grid[j][i] = "#"
 
                 sx, sy = x, y
 
         if part == 2:
-            self.grid[self.bottom + 2] = ['#'] * (2 * self.right + 1)
+            self.grid[self.bottom + 2] = ["#"] * (2 * self.right + 1)
 
         self.sand = 500 - self.left
         self.encoder = Encoder(f"../sillyXD/{video}", grid=self.grid)
 
-
     def place_sand(self) -> bool:
         sx, sy = self.sand, 0
         while sy < self.bottom:
-            if self.grid[sy + 1][sx] != '.':
-                if self.grid[sy + 1][sx - 1] != '.':
-                    if self.grid[sy + 1][sx + 1] != '.':
-                        self.grid[sy][sx] = 'o'
+            if self.grid[sy + 1][sx] != ".":
+                if self.grid[sy + 1][sx - 1] != ".":
+                    if self.grid[sy + 1][sx + 1] != ".":
+                        self.grid[sy][sx] = "o"
                         return sx, sy
                     else:
                         sx += 1
@@ -126,15 +124,14 @@ class Solution:
             sy += 1
 
         return 500 - self.left, 0
-
 
     def place_sand2(self) -> bool:
         sx, sy = self.sand, 0
-        while self.grid[0][500 - self.left] == '.':
-            if self.grid[sy + 1][sx] != '.':
-                if self.grid[sy + 1][sx - 1] != '.':
-                    if self.grid[sy + 1][sx + 1] != '.':
-                        self.grid[sy][sx] = 'o'
+        while self.grid[0][500 - self.left] == ".":
+            if self.grid[sy + 1][sx] != ".":
+                if self.grid[sy + 1][sx - 1] != ".":
+                    if self.grid[sy + 1][sx + 1] != ".":
+                        self.grid[sy][sx] = "o"
                         return sx, sy
                     else:
                         sx += 1
@@ -144,7 +141,6 @@ class Solution:
             sy += 1
 
         return 500 - self.left, 0
-
 
     def solve_part1(self) -> int:
         count = 0
@@ -156,7 +152,6 @@ class Solution:
 
         self.encoder.save()
         return count
-
 
     def solve_part2(self) -> int:
         count = 0

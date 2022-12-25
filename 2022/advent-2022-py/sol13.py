@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys

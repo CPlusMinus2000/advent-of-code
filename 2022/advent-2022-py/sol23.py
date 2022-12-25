@@ -94,9 +94,7 @@ class Solution:
                     self.elves.append((x, y))
 
     def solve_part1(self) -> int:
-        proposal_queue = [
-            propose_north, propose_south, propose_west, propose_east
-        ]
+        proposal_queue = [propose_north, propose_south, propose_west, propose_east]
 
         for _ in range(10):
             proposal_counts = defaultdict(int)
@@ -135,9 +133,7 @@ class Solution:
         return (maxx - minx + 1) * (maxy - miny + 1) - len(self.elves)
 
     def solve_part2(self) -> int:
-        proposal_queue = [
-            propose_north, propose_south, propose_west, propose_east
-        ]
+        proposal_queue = [propose_north, propose_south, propose_west, propose_east]
 
         r = 1
         while True:

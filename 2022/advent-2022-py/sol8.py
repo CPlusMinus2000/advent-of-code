@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -8,16 +7,14 @@ from datetime import datetime
 def emax(l):
     return max(l) if l else -1
 
+
 class Solution:
     def __init__(self, filename: str):
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
 
-        self.trees = [
-            [int(c) for c in line]
-            for line in self.input_lines
-        ]
+        self.trees = [[int(c) for c in line] for line in self.input_lines]
 
     def solve_part1(self) -> int:
         count = 0
@@ -25,11 +22,15 @@ class Solution:
             for x in range(len(self.trees[y])):
                 # Check up, down, left, right for higher trees
                 lmax = emax(self.trees[y][:x])
-                rmax = emax(self.trees[y][x+1:])
+                rmax = emax(self.trees[y][x + 1 :])
                 umax = emax([row[x] for row in self.trees[:y]])
-                dmax = emax([row[x] for row in self.trees[y+1:]])
-                if self.trees[y][x] > lmax or self.trees[y][x] > rmax or \
-                    self.trees[y][x] > umax or self.trees[y][x] > dmax:
+                dmax = emax([row[x] for row in self.trees[y + 1 :]])
+                if (
+                    self.trees[y][x] > lmax
+                    or self.trees[y][x] > rmax
+                    or self.trees[y][x] > umax
+                    or self.trees[y][x] > dmax
+                ):
                     count += 1
 
         return count
@@ -39,8 +40,12 @@ class Solution:
         for y in range(len(self.trees)):
             for x in range(len(self.trees[y])):
                 # If we're on the edge, skip
-                if x == 0 or x == len(self.trees[y]) - 1 or \
-                    y == 0 or y == len(self.trees) - 1:
+                if (
+                    x == 0
+                    or x == len(self.trees[y]) - 1
+                    or y == 0
+                    or y == len(self.trees) - 1
+                ):
                     continue
 
                 # Starting from x, y, check all directions for trees
@@ -53,12 +58,15 @@ class Solution:
                 while left < x and self.trees[y][x - left] < height:
                     left += 1
 
-                while down < len(self.trees) - y - 1 and \
-                    self.trees[y + down][x] < height:
+                while (
+                    down < len(self.trees) - y - 1 and self.trees[y + down][x] < height
+                ):
                     down += 1
 
-                while right < len(self.trees[y]) - x - 1 and \
-                    self.trees[y][x + right] < height:
+                while (
+                    right < len(self.trees[y]) - x - 1
+                    and self.trees[y][x + right] < height
+                ):
                     right += 1
 
                 score = up * left * down * right

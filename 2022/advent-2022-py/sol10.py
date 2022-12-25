@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -42,9 +41,9 @@ class Solution:
 
     def pixel(self, register, cycle):
         cycle -= 1
-        c = '#' if abs((cycle % 40) - register) <= 1 else ' '
+        c = "#" if abs((cycle % 40) - register) <= 1 else " "
         if cycle % 40 == 39:
-            c += '\n'
+            c += "\n"
 
         return c
 
@@ -66,7 +65,7 @@ class Solution:
                 total += self.pixel(X, cycle)
 
             instr += 1
-        
+
         return total
 
 

@@ -79,7 +79,7 @@ class Solution:
                 (lambda x, y, sx, sy: x != sx, 1, 1),
                 (lambda x, y, sx, sy: y != sy, 1, -1),
                 (lambda x, y, sx, sy: x != sx, -1, -1),
-                (lambda x, y, sx, sy: y != sy, -1, 1)
+                (lambda x, y, sx, sy: y != sy, -1, 1),
             ]
 
             for loop in loops:

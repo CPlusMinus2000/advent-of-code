@@ -1,4 +1,3 @@
-
 import argparse as ap
 import re
 import sys
@@ -14,7 +13,7 @@ class Solution:
         with open(filename, "r") as f:
             self.input = f.read()
             self.input_lines = self.input.splitlines()
-        
+
         self.encrypted = [int(x) for x in self.input_lines]
 
     def solve_part1(self) -> int:
@@ -34,11 +33,7 @@ class Solution:
             indices.insert((iindex + val) % (l - 1), True)
 
         zindex = self.encrypted.index(0)
-        return sum(
-            self.encrypted[(i + zindex) % l]
-            for i in [1000, 2000, 3000]
-        )
-            
+        return sum(self.encrypted[(i + zindex) % l] for i in [1000, 2000, 3000])
 
     def solve_part2(self) -> int:
         for i in range(len(self.encrypted)):
@@ -55,7 +50,7 @@ class Solution:
             self.encrypted.insert((iindex + val) % (l - 1), val)
             indices.pop(iindex)
             indices.insert((iindex + val) % (l - 1), i)
-        
+
         # Now mix self.encrypted 9 more times, but notably,
         # mix them up in the order they were originally mixed up
         for _ in range(9):
@@ -67,10 +62,7 @@ class Solution:
                 indices.insert((iindex + val) % (l - 1), i)
 
         zindex = self.encrypted.index(0)
-        return sum(
-            self.encrypted[(i + zindex) % l]
-            for i in [1000, 2000, 3000]
-        )
+        return sum(self.encrypted[(i + zindex) % l] for i in [1000, 2000, 3000])
 
 
 if __name__ == "__main__":
