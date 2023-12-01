@@ -142,3 +142,7 @@ out.txt
 path.txt
 good.txt
 bad.txt
+
+# Rust
+**/target/
+**/Cargo.lock
