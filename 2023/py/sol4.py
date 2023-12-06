@@ -23,7 +23,7 @@ class Solution:
             have_nums = have.strip().split()
             how_many = sum(1 for n in have_nums if n in win_nums)
             total += int(2 ** (how_many - 1))
-        
+
         return total
 
     def solve_part2(self) -> int:
@@ -39,7 +39,6 @@ class Solution:
                 if i <= len(self.input_lines):
                     total[i] += total[cnum]
 
-        print(total)
         return sum(total.values())
 
 
