@@ -59,7 +59,7 @@ class Solution:
                         passover.append(range(source.stop, r.stop))
                     else:
                         passover.append(r)
-                
+
                 curr = passover
 
             succ.extend(passover)
@@ -96,7 +96,7 @@ class Solution:
             for cor in mapr[1:]:
                 dest, source, length = map(int, cor.split())
                 maps[-1][range(source, source + length)] = range(dest, dest + length)
-        
+
         result_ranges = self.feed_ranges_through(seed_ranges, maps)
         return min([r.start for r in result_ranges])
 

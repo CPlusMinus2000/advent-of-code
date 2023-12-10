@@ -19,7 +19,7 @@ class Solution:
         for line in self.input_lines:
             digits = [c for c in line if c.isdigit()]
             total += int(digits[0]) * 10 + int(digits[-1])
-        
+
         return total
 
     def digits_parser(self, line: str) -> int:
@@ -32,7 +32,7 @@ class Solution:
             "six": 6,
             "seven": 7,
             "eight": 8,
-            "nine": 9
+            "nine": 9,
         }
 
         start, end = 0, 0
@@ -45,7 +45,7 @@ class Solution:
                 break
 
             line = line[1:]
-        
+
         while True:
             if line[-1].isdigit():
                 end = int(line[-1])
@@ -55,17 +55,16 @@ class Solution:
                 break
 
             line = line[:-1]
-        
+
         return start * 10 + end
-            
 
     def solve_part2(self) -> int:
         total = 0
         for line in self.input_lines:
             total += self.digits_parser(line)
-        
+
         return total
-            
+
 
 if __name__ == "__main__":
     parser = ap.ArgumentParser()

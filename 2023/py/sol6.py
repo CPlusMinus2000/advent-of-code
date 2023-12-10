@@ -24,27 +24,27 @@ class Solution:
                 dist = j * (times[i] - j)
                 if dist > records[i]:
                     ways += 1
-            
+
             total *= ways
-        
+
         return total
 
     def solve_part2(self) -> int:
-        time = int(''.join(self.input_lines[0].split()[1:]))
-        record = int(''.join(self.input_lines[1].split()[1:]))
+        time = int("".join(self.input_lines[0].split()[1:]))
+        record = int("".join(self.input_lines[1].split()[1:]))
         lo, hi = 0, 0
         for j in range(time + 1):
             dist = j * (time - j)
             if dist > record:
                 lo = j
                 break
-        
+
         for j in range(time, -1, -1):
             dist = j * (time - j)
             if dist > record:
                 hi = j
                 break
-        
+
         return hi - lo + 1
 
 

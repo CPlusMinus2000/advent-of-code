@@ -9,10 +9,12 @@ from collections import defaultdict
 from functools import cmp_to_key
 
 
-POINT_VALS = {
-    str(i): i for i in range(2, 10)
-} | {
-    "T": 10, "J": 11, "Q": 12, "K": 13, "A": 14
+POINT_VALS = {str(i): i for i in range(2, 10)} | {
+    "T": 10,
+    "J": 11,
+    "Q": 12,
+    "K": 13,
+    "A": 14,
 }
 
 JUNK = 0
@@ -58,6 +60,7 @@ def cmp_hands(hand1: str, hand2: str) -> int:
 
     return 0
 
+
 cmp_hands_key = cmp_to_key(cmp_hands)
 
 
@@ -73,13 +76,13 @@ class Solution:
             hand, bid = line.split()
             bid = int(bid)
             hands.append((hand, bid))
-        
+
         hands.sort(key=lambda x: cmp_hands_key(x[0]))
         sum = 0
         for i in range(len(hands)):
             print(hands[i])
             sum += (i + 1) * hands[i][1]
-        
+
         return sum
 
     def solve_part2(self) -> int:
@@ -91,13 +94,13 @@ class Solution:
             hand, bid = line.split()
             bid = int(bid)
             hands.append((hand, bid))
-        
+
         hands.sort(key=lambda x: cmp_hands_key(x[0]))
         sum = 0
         for i in range(len(hands)):
             print(hands[i])
             sum += (i + 1) * hands[i][1]
-        
+
         return sum
 
 
