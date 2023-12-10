@@ -3,9 +3,10 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day6;
+pub mod day8;
 pub mod day9;
 
 fn main() {
-    day9::part1();
-    day9::part2();
+    day8::part1();
+    day8::part2();
 }
