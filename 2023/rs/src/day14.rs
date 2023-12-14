@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -81,10 +82,46 @@ pub fn part1() {
     let fname = "../data/day14.txt";
     let input = read_input(fname);
     let new_grid = move_all_rocks(input, (0, -1));
-    _print_grid(new_grid.clone());
     let result = calculate_load(new_grid);
 
     println!("Result: {}", result);
 }
 
-pub fn part2() {}
+pub fn part2() {
+    let fname = "../data/day14.txt";
+    let input = read_input(fname);
+    let mut new_grid = input.clone();
+    let mut seen_grids = HashMap::new();
+    let mut cycles = 0;
+
+    seen_grids.insert(new_grid.clone(), cycles);
+    loop {
+        new_grid = move_all_rocks(new_grid, (0, -1));
+        new_grid = move_all_rocks(new_grid, (-1, 0));
+        new_grid = move_all_rocks(new_grid, (0, 1));
+        new_grid = move_all_rocks(new_grid, (1, 0));
+
+        cycles += 1;
+
+        if seen_grids.contains_key(&new_grid.clone()) {
+            // We should have enough information to calculate
+            break;
+        }
+
+        seen_grids.insert(new_grid.clone(), cycles);
+    }
+
+    let cycle_length = cycles - seen_grids.get(&new_grid).unwrap();
+    let mut remaining_cycles = (1_000_000_000 - cycles) % cycle_length;
+    while remaining_cycles > 0 {
+        new_grid = move_all_rocks(new_grid, (0, -1));
+        new_grid = move_all_rocks(new_grid, (-1, 0));
+        new_grid = move_all_rocks(new_grid, (0, 1));
+        new_grid = move_all_rocks(new_grid, (1, 0));
+
+        remaining_cycles -= 1;
+    }
+
+    let result = calculate_load(new_grid);
+    println!("Result: {}", result);
+}
