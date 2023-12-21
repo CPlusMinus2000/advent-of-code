@@ -118,17 +118,16 @@ class Solution:
                 t = Trench(x - length, x, y)
                 ltrenches.append(t)
                 x -= length
-            
+
             boundary += length
-        
+
         # Find trenches with the same endpoints
         rtrenches.sort(key=lambda t: -t.start)
         while rtrenches:
             rt = rtrenches.pop()
             try:
                 ltind = next(
-                    i for i, lt in enumerate(ltrenches)
-                    if lt.start == rt.start
+                    i for i, lt in enumerate(ltrenches) if lt.start == rt.start
                 )
             except StopIteration:
                 ltrenches.sort()
@@ -141,7 +140,11 @@ class Solution:
             endpoint = min(rt.end, lt.end)
             area += (lt.y_level - rt.y_level) * (endpoint - rt.start)
             if rt.end > endpoint:
-                insort(rtrenches, Trench(endpoint, rt.end, rt.y_level), key=lambda t: -t.start)
+                insort(
+                    rtrenches,
+                    Trench(endpoint, rt.end, rt.y_level),
+                    key=lambda t: -t.start,
+                )
             elif lt.end > endpoint:
                 ltrenches.append(Trench(endpoint, lt.end, lt.y_level))
 
