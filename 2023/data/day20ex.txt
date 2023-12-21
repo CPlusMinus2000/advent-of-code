@@ -1,0 +1,5 @@
+broadcaster -> a
+%a -> inv, con, rx
+&inv -> b
+%b -> con
+%rx -> output
